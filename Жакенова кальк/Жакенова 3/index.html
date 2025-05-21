@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Жакенова Loan</title>
+<style>
+  body {
+    background: #f0f4f8;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+  .calculator {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .calculator h2 {
+    margin: 0 0 10px;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+  }
+  label {
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    display: block;
+  }
+  input[type="number"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.8px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+  }
+  input[type="number"]:focus {
+    border-color: #4a90e2;
+    outline: none;
+  }
+  button {
+    background: #5d9f45;
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.25s ease;
+  }
+  button:hover {
+    background: #a66960;
+  }
+  .result {
+    background: #eef6fc;
+    border-radius: 10px;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+  }
+  .result span {
+    color: #4e9121;
+  }
+</style>
+</head>
+<body>
+  <section class="calculator" aria-label="Калькулятор кредита">
+    <h2>Калькулятор кредита</h2>
+    <form id="loanForm" novalidate>
+      <label for="amount">Сумма кредита (₽):</label>
+      <input type="number" id="amount" name="amount" min="1" step="any" required placeholder="Введите сумму кредита" />
+      
+      <label for="interest">Годовая процентная ставка (%):</label>
+      <input type="number" id="interest" name="interest" min="0" step="any" required placeholder="Введите ставку" />
+      
+      <label for="years">Срок кредита (лет):</label>
+      <input type="number" id="years" name="years" min="1" step="1" required placeholder="Введите срок" />
+      
+      <button type="submit">Рассчитать</button>
+    </form>
+    <div class="result" id="result" aria-live="polite" role="region" aria-atomic="true">
+      Введите данные и нажмите "Рассчитать"
+    </div>
+  </section>
+
+<script>
+  const loanForm = document.getElementById('loanForm');
+  const resultDiv = document.getElementById('result');
+
+  loanForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    // Считываем и проверяем данные
+    const amount = parseFloat(loanForm.amount.value);
+    const interest = parseFloat(loanForm.interest.value);
+    const years = parseInt(loanForm.years.value, 10);
+
+    if (isNaN(amount) || amount <= 0) {
+      showError('Пожалуйста, введите корректную сумму кредита больше 0.');
+      return;
+    }
+    if (isNaN(interest) || interest < 0) {
+      showError('Пожалуйста, введите корректную процентную ставку (0 или больше).');
+      return;
+    }
+    if (isNaN(years) || years <= 0) {
+      showError('Пожалуйста, введите корректный срок кредита (целое число больше 0).');
+      return;
+    }
+
+    // Расчёт
+    const monthlyInterestRate = interest / 100 / 12;
+    const numberOfPayments = years * 12;
+
+    let monthlyPayment;
+    if (monthlyInterestRate === 0) {
+      // Без процентов
+      monthlyPayment = amount / numberOfPayments;
+    } else {
+      // Формула аннуитетного платежа
+      monthlyPayment = 
+        (amount * monthlyInterestRate) / 
+        (1 - Math.pow(1 + monthlyInterestRate, -numberOfPayments));
+    }
+
+    const totalPayment = monthlyPayment * numberOfPayments;
+    const totalInterest = totalPayment - amount;
+
+    // Форматируем в рубли с разделителем тысяч и 2 знаками после запятой
+    const formatRub = num => num.toLocaleString('ru-RU', {style: 'currency', currency: 'RUB'});
+
+    // Вывод результата
+    resultDiv.innerHTML = `
+      <div>Ежемесячный платеж: <span>${formatRub(monthlyPayment)}</span></div>
+      <div>Общая сумма к выплате: <span>${formatRub(totalPayment)}</span></div>
+      <div>Переплата по процентам: <span>${formatRub(totalInterest)}</span></div>
+    `;
+  });
+
+  function showError(message) {
+    resultDiv.textContent = message;
+    resultDiv.style.color = 'crimson';
+    setTimeout(() => {
+      resultDiv.style.color = '';
+      resultDiv.textContent = 'Введите данные и нажмите "Рассчитать"';
+    }, 4000);
+  }
+</script>
+</body>
+</html>

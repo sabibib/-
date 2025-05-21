@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Жакенова 1 макет</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="container">
+        <div class="nav_fill">
+          <ul class="left">
+            <li><a href=""><img src="logo.png" alt="" /></a></li>
+            <li><a href="">Цены</a></li>
+            <li><a href="">Услуги</a></li>
+            <li><a href="">Портфолио</a></li>
+            <li><a href="">Акции</a></li>
+          </ul>
+          <button class="btn" id="openCalcBtn">Калькулятор ремонта</button>
+        </div>
+      </div>
+    </nav>
+
+    <main
+      class="calculator"
+      role="main"
+      aria-label="Калькулятор стоимости ремонта"
+    >
+      <h1>РАССЧИТАЙТЕ СТОИМОСТЬ РЕМОНТА</h1>
+      <form id="repairCalc" oninput="calculate()">
+        <fieldset>
+          <legend>Вид ремонта:</legend>
+          <div
+            class="radio-group first"
+            role="radiogroup"
+            aria-labelledby="repairTypeLabel"
+          >
+            <label
+              ><input type="radio" name="repairType" value="cosmetic" checked />
+              Косметический</label
+            >
+            <label
+              ><input type="radio" name="repairType" value="capital" />
+              Капитальный</label
+            >
+            <label
+              ><input type="radio" name="repairType" value="euro" /> Под
+              ключ</label
+            >
+            <label
+              ><input type="radio" name="repairType" value="designer" />
+              Дизайнерский</label
+            >
+          </div>
+        </fieldset>
+        <hr />
+
+        <fieldset>
+          <legend>Тип недвижимости</legend>
+          <div
+            class="radio-group"
+            role="radiogroup"
+            aria-labelledby="propertyTypeLabel"
+          >
+            <label
+              ><input
+                type="radio"
+                name="propertyType"
+                value="apartment"
+                checked
+              />
+              Новостройка</label
+            >
+            <label
+              ><input type="radio" name="propertyType" value="house" />
+              Вторичное жилье</label
+            >
+          </div>
+        </fieldset>
+        <hr />
+
+        <fieldset>
+          <legend>Количество комнат</legend>
+          <div
+            class="radio-group"
+            role="radiogroup"
+            aria-labelledby="roomsLabel"
+          >
+            <label
+              ><input type="radio" name="rooms" value="1" checked /> 1</label
+            >
+            <label><input type="radio" name="rooms" value="2" /> 2</label>
+            <label><input type="radio" name="rooms" value="3" /> 3</label>
+            <label><input type="radio" name="rooms" value="4" /> 4</label>
+          </div>
+        </fieldset>
+        <hr />
+        <fieldset>
+          <legend>Площадь, м2</legend>
+          <div class="slider-container">
+            <input
+              type="range"
+              id="areav"
+              name="area"
+              min="20"
+              max="200"
+              value="50"
+              step="1"
+              aria-valuemin="20"
+              aria-valuemax="200"
+              aria-valuenow="50"
+              aria-label="Площадь в квадратных метрах"
+            />
+            <div class="value-display" id="areaValue">50 м²</div>
+          </div>
+        </fieldset>
+
+        <div class="results" aria-live="polite" aria-atomic="true" id="results">
+          Срок ремонта: —<br />
+          Полная стоимость: —
+        </div>
+
+        <button type="submit">Заказать</button>
+      </form>
+    </main>
+
+    <script src="main.js"></script>
+  </body>
+</html>

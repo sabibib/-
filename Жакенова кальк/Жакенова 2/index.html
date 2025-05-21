@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Жакенова 2</title>
+<style>
+  body {
+    background: #514f61;
+    color: #dbdbdb;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .calculator {
+    background: #12031b;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #6c6cb5;
+    padding: 30px 40px;
+    max-width: 400px;
+    width: 100%;
+  }
+  .calculator h1 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    font-size: 1.9rem;
+    color: #cbe9ff;
+    user-select: none;
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #ffffff;
+  }
+  input[type="number"], select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    background: #3b3b58;
+    color: #d0d0ff;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    outline-offset: 3px;
+    outline-color: #7aaaff;
+    transition: background 0.3s ease;
+  }
+  input[type="number"]:focus, select:focus {
+    background: #afaffb;
+  }
+  .result {
+    background: #38384e;
+    border-radius: 10px;
+    padding: 20px 25px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+    user-select: none;
+    box-shadow: inset 0 0 15px #ece3ffaa;
+  }
+  button {
+    width: 100%;
+    padding: 14px 0;
+    border-radius: 10px;
+    border: none;
+    background: #7e78a4;
+    color: #e0f7d4;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 5px 15px #7700ff75;
+    transition: background 0.3s ease, transform 0.2s ease;
+    user-select: none;
+  }
+  button:hover {
+    background: #d8a4a4;
+    transform: translateY(-2px);
+  }
+  button:active {
+    transform: translateY(0);
+  }
+  .footer {
+    margin-top: 15px;
+    font-size: 0.85rem;
+    text-align: center;
+    color: #5a5a7a;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+  <div class="calculator" role="main" aria-label="Калькулятор стоимости">
+    <h1>Калькулятор стоимости</h1>
+    <form id="costForm" aria-describedby="resultLabel">
+      <label for="price">Цена за ед., ₽</label>
+      <input type="number" id="price" name="price" min="0" step="0.01" aria-required="true" placeholder="Введите цену" />
+      
+      <label for="quantity">Количество, шт.</label>
+      <input type="number" id="quantity" name="quantity" min="0" step="1" aria-required="true" placeholder="Введите количество" />
+      
+      <label for="discount">Скидка, %</label>
+      <input type="number" id="discount" name="discount" min="0" max="100" step="0.1" value="0" aria-required="false" placeholder="0" />
+      
+      <label for="tax">Налог</label>
+      <select id="tax" name="tax" aria-required="true">
+        <option value="0">Без налога</option>
+        <option value="5">5%</option>
+        <option value="10">10%</option>
+        <option value="18">18%</option>
+        <option value="20">20%</option>
+      </select>
+      
+      <button type="submit" aria-label="Рассчитать стоимость">Рассчитать</button>
+    </form>
+    <div class="result" id="result" aria-live="polite" aria-atomic="true" aria-label="Результат расчёта стоимости" tabindex="0">Общая стоимость: 0 ₽</div>
+    <div class="footer">© 2024 Калькулятор стоимости</div>
+  </div>
+
+  <script>
+    // Функция форматирования числа в рубли с разделителем тысяч и 2 знаками после запятой
+    function formatRub(value) {
+      return value.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB' });
+    }
+
+    // Основная логика калькулятора стоимости
+    document.getElementById('costForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Получаем значения из формы
+      const price = parseFloat(this.price.value);
+      const quantity = parseInt(this.quantity.value, 10);
+      let discount = parseFloat(this.discount.value);
+      const taxRate = parseFloat(this.tax.value);
+
+      // Валидация вводимых данных
+      if (isNaN(price) || price < 0) {
+        alert('Пожалуйста, введите корректную цену.');
+        this.price.focus();
+        return;
+      }
+      if (isNaN(quantity) || quantity < 0) {
+        alert('Пожалуйста, введите корректное количество.');
+        this.quantity.focus();
+        return;
+      }
+      if (isNaN(discount) || discount < 0) discount = 0;
+      if (discount > 100) discount = 100;
+
+      // Рассчитываем стоимость без скидки
+      let costWithoutDiscount = price * quantity;
+
+      // Рассчитываем сумму скидки
+      const discountAmount = costWithoutDiscount * (discount / 100);
+
+      // Стоимость с учётом скидки
+      const costWithDiscount = costWithoutDiscount - discountAmount;
+
+      // Рассчитываем налог
+      const taxAmount = costWithDiscount * (taxRate / 100);
+
+      // Итоговая стоимость
+      const totalCost = costWithDiscount + taxAmount;
+
+      // Вывод результата с форматированием
+      const resultBlock = document.getElementById('result');
+      resultBlock.textContent = `Общая стоимость: ${formatRub(totalCost)}`;
+      resultBlock.focus();
+    });
+  </script>
+</body>
+</html>
